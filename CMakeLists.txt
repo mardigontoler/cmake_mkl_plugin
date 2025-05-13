@@ -4,8 +4,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 message("Finding Intel MKL")
 set(MKL_LINK "static")
-find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT} MKL_LINK=static)
-message(STATUS "${MKL_IMPORTED_TARGETS}") #Provides available list of targets based on input
+# This is needed to prevent a runtime dependency on a threading library like libopenmp5  that would prevent the plugin
+# from loading on systems without it installed
+set(MKL_THREADING "sequential")
+find_package(MKL CONFIG REQUIRED PATHS $ENV{MKLROOT})
+message(STATUS "${MKL_IMPORTED_TARGETS}") # Provides available list of targets based on input
 
 
 project(mkl_plugin VERSION 0.1)
@@ -64,5 +67,3 @@ target_link_libraries(mkl_plugin
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags
 )
-
-set( CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined" )
